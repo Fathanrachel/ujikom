@@ -27,8 +27,9 @@ namespace PerpustakaanApp
                 Console.WriteLine("\n=== Sistem Manajemen Perpustakaan ===");
                 Console.WriteLine("1. Tambah Buku");
                 Console.WriteLine("2. Tampilkan Buku (dari Database)");
-                Console.WriteLine("3. Simpan Data ke Media Penyimpan (File JSON)");
-                Console.WriteLine("4. Keluar");
+                Console.WriteLine("3. Simpan Data ke Media Penyimpan (File Teks)");
+                Console.WriteLine("4. Ubah Data Buku (Implementasi Overloading)");
+                Console.WriteLine("5. Keluar");
                 Console.Write("Pilih menu: ");
                 
                 string pilihan = Console.ReadLine();
@@ -48,6 +49,10 @@ namespace PerpustakaanApp
                 }
                 else if (pilihan == "4")
                 {
+                    UbahBuku();
+                }
+                else if (pilihan == "5")
+                {
                     isRunning = false;
                     Console.WriteLine("Terima kasih telah menggunakan sistem ini.");
                 }
@@ -59,6 +64,35 @@ namespace PerpustakaanApp
         }
 
         // Penggunaan prosedur/fungsi/method
+        /// <summary>
+        /// Method untuk mengubah data buku (Implementasi Overloading).
+        /// </summary>
+        static void UbahBuku()
+        {
+            Console.Write("Masukkan ID Buku yang ingin diubah: ");
+            if (!int.TryParse(Console.ReadLine(), out int id))
+            {
+                Console.WriteLine("ID harus berupa angka!");
+                return;
+            }
+            
+            Console.Write("Masukkan Judul Baru: ");
+            string judulBaru = Console.ReadLine();
+            
+            Console.Write("Masukkan Penulis Baru: ");
+            string penulisBaru = Console.ReadLine();
+
+            Buku bukuEdit = new Buku(id, "", "");
+            
+            // Implementasi Overloading
+            // Disini kita memanggil metode UpdateInfo versi kedua (2 parameter)
+            bukuEdit.UpdateInfo(judulBaru, penulisBaru);
+            
+            // Simpan perubahan ke DB (Insert OR REPLACE)
+            DatabaseHelper.InsertBuku(bukuEdit);
+            Console.WriteLine("Buku berhasil diperbarui!");
+        }
+
         /// <summary>
         /// Method untuk menambah buku baru ke database.
         /// </summary>
@@ -100,10 +134,10 @@ namespace PerpustakaanApp
             }
 
             Console.WriteLine("\nDaftar Buku:");
-            // D. Pengulangan foreach
+            // Pengulangan foreach
             foreach (ItemPerpustakaan item in daftarItem)
             {
-                // H. Polymorphism sejati: Memanggil method TampilkanInfo dari reference tipe induk (ItemPerpustakaan),
+                // Polymorphism sejati: Memanggil method TampilkanInfo dari reference tipe induk (ItemPerpustakaan),
                 // namun implementasi yang dieksekusi adalah milik class turunannya (Buku).
                 item.TampilkanInfo();
             }
@@ -114,10 +148,10 @@ namespace PerpustakaanApp
         /// </summary>
         static void SimpanDataKeFile()
         {
-            // F. Penggunaan Array
+            // Penggunaan Array
             ItemPerpustakaan[] daftarItem = DatabaseHelper.GetAllBuku();
             
-            // G. Menyimpan data di media penyimpan (Tulis ke TXT)
+            // Menyimpan data di media penyimpan (Tulis ke TXT)
             using (StreamWriter sw = new StreamWriter("data_buku.txt"))
             {
                 foreach (Buku buku in daftarItem)
@@ -127,9 +161,9 @@ namespace PerpustakaanApp
             }
             Console.WriteLine("Data berhasil disimpan ke file data_buku.txt");
             
-            // G. Membaca data dari media penyimpan (Baca dari TXT)
+            // Membaca data dari media penyimpan (Baca dari TXT)
             Console.WriteLine("\n-- Simulasi Membaca File data_buku.txt --");
-            // F. Penggunaan Array (ReadAllLines mereturn array string)
+            // Penggunaan Array (ReadAllLines mereturn array string)
             string[] isiFile = File.ReadAllLines("data_buku.txt");
             foreach (string teks in isiFile)
             {
