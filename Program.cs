@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Data.Sqlite;
-using Newtonsoft.Json;
 using PerpustakaanApp.Models;
 using PerpustakaanApp.Database;
 
@@ -91,41 +90,52 @@ namespace PerpustakaanApp
         /// </summary>
         static void TampilkanBuku()
         {
-            // Penggunaan Array
-            Buku[] daftarBuku = DatabaseHelper.GetAllBuku();
+            // F. Penggunaan Array dengan tipe Base Class (Mendukung Polymorphism)
+            ItemPerpustakaan[] daftarItem = DatabaseHelper.GetAllBuku();
             
-            if (daftarBuku.Length == 0)
+            if (daftarItem.Length == 0)
             {
                 Console.WriteLine("Tidak ada buku di database.");
                 return;
             }
 
             Console.WriteLine("\nDaftar Buku:");
-            // Pengulangan foreach
-            foreach (var buku in daftarBuku)
+            // D. Pengulangan foreach
+            foreach (ItemPerpustakaan item in daftarItem)
             {
-                // Polymorphism (TampilkanInfo)
-                buku.TampilkanInfo();
+                // H. Polymorphism sejati: Memanggil method TampilkanInfo dari reference tipe induk (ItemPerpustakaan),
+                // namun implementasi yang dieksekusi adalah milik class turunannya (Buku).
+                item.TampilkanInfo();
             }
         }
 
         /// <summary>
-        /// Method untuk menyimpan data array buku ke media penyimpan (File JSON).
+        /// Method untuk menyimpan dan membaca data array buku dari media penyimpan (File Teks/TXT).
         /// </summary>
         static void SimpanDataKeFile()
         {
-            Buku[] daftarBuku = DatabaseHelper.GetAllBuku();
+            // F. Penggunaan Array
+            ItemPerpustakaan[] daftarItem = DatabaseHelper.GetAllBuku();
             
-            // Memanfaatkan eksternal library (Newtonsoft.Json)
-            string json = JsonConvert.SerializeObject(daftarBuku, Formatting.Indented);
+            // G. Menyimpan data di media penyimpan (Tulis ke TXT)
+            using (StreamWriter sw = new StreamWriter("data_buku.txt"))
+            {
+                foreach (Buku buku in daftarItem)
+                {
+                    sw.WriteLine($"{buku.Id} - {buku.Judul} - {buku.Penulis}");
+                }
+            }
+            Console.WriteLine("Data berhasil disimpan ke file data_buku.txt");
             
-            // Menyimpan dan membaca data di media penyimpan
-            File.WriteAllText("data_buku.json", json);
-            Console.WriteLine("Data berhasil disimpan ke file data_buku.json");
-            
-            // Simulasi membaca data dari file
-            string readJson = File.ReadAllText("data_buku.json");
-            Console.WriteLine("Berhasil membaca ulang dari file. Panjang karakter: " + readJson.Length);
+            // G. Membaca data dari media penyimpan (Baca dari TXT)
+            Console.WriteLine("\n-- Simulasi Membaca File data_buku.txt --");
+            // F. Penggunaan Array (ReadAllLines mereturn array string)
+            string[] isiFile = File.ReadAllLines("data_buku.txt");
+            foreach (string teks in isiFile)
+            {
+                Console.WriteLine(teks);
+            }
+            Console.WriteLine("-----------------------------------------");
         }
     }
 }
